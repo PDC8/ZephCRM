@@ -1,8 +1,7 @@
+// Sample data structures based on the spreadsheet requirements
+export const STAGES = ['Ramp On', 'Kit', 'Program', 'Maintenance', 'Ramp Off'];
 
-// data/sampleData.js
-export const stages = ['Ramp On', 'Kit', 'Program', 'Maintenance', 'Ramp Off'];
-
-export const subStages = {
+export const SUB_STAGES = {
   'Ramp On': ['Referred', 'Enrollment Attempted', 'Enrollment Completed', 'Onboarding Attempted', 'Onboarding Completed'],
   'Kit': ['Shipped From', 'Outbound Shipped', 'Outbound Delivered', 'Inbound Shipped', 'Inbound Delivered'],
   'Program': ['Active - Weeks 1-9', 'Active - Weeks 10-18', 'Active - Weeks 19-36'],
@@ -10,19 +9,13 @@ export const subStages = {
   'Ramp Off': ['Offboarding Attempted', 'Offboarding Completed', 'Exited']
 };
 
-export const stageBadgeClass = {
-  'Ramp On': 'badge-blue',
-  'Kit': 'badge-purple',
-  'Program': 'badge-green',
-  'Maintenance': 'badge-amber',
-  'Ramp Off': 'badge-gray'
-};
-
-export const generateSamplePatients = () => {
+export function generateSamplePatients(availableCohortIds) {
   return Array.from({ length: 25 }, (_, i) => {
-    const stage = stages[Math.floor(Math.random() * stages.length)];
-    const subStageList = subStages[stage];
+    const stage = STAGES[Math.floor(Math.random() * STAGES.length)];
+    const subStageList = SUB_STAGES[stage];
     const subStage = subStageList[Math.floor(Math.random() * subStageList.length)];
+    const cohortId = availableCohortIds[Math.floor(Math.random() * availableCohortIds.length)];
+
     return {
       id: `P${1000 + i}`,
       name: `Patient ${i + 1}`,
@@ -31,9 +24,10 @@ export const generateSamplePatients = () => {
       state: ['AZ', 'CA', 'TX', 'NY', 'FL'][Math.floor(Math.random() * 5)],
       currentStage: stage,
       currentSubStage: subStage,
-      cohortId: `C${200 + Math.floor(Math.random() * 20)}`,
+      cohortId: cohortId,
       lastActivity: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
 
+      // Ramp On data (writeable)
       rampOn: {
         stage: 'Onboarding Completed',
         time: '45 Days',
@@ -43,6 +37,8 @@ export const generateSamplePatients = () => {
         onboardingAttempted: '09/10/25',
         onboardingCompleted: '09/15/25'
       },
+
+      // Kit data (writeable)
       kit: {
         stage: 'Inbound Delivered',
         time: '12 Days',
@@ -55,6 +51,8 @@ export const generateSamplePatients = () => {
         inboundShipped: '10/22/25',
         inboundDelivered: '10/25/25'
       },
+
+      // Program data (writeable)
       program: {
         stage: 'Active - Week 12',
         time: '84 Days',
@@ -65,13 +63,15 @@ export const generateSamplePatients = () => {
         soloSessionsAvailable: 8,
         soloSessionAttendance: `${Math.floor(50 + Math.random() * 45)}%`,
         cohortType: 'Group A',
-        cohortId: `C${200 + Math.floor(Math.random() * 20)}`,
+        cohortId: cohortId,
         liveSessionType: '90 MINUTES',
         liveDays: 'M-W',
         liveTime: '2:00 PM',
         soloDays: 'Th',
         soloTime: '2:00 PM'
       },
+
+      // Maintenance data (writeable)
       maintenance: Math.random() > 0.6 ? {
         stage: 'Month 3',
         time: '90 Days',
@@ -81,13 +81,15 @@ export const generateSamplePatients = () => {
         soloSessionsAttended: Math.floor(Math.random() * 12),
         soloSessionAttendance: `${Math.floor(50 + Math.random() * 45)}%`,
         cohortType: 'Group B',
-        cohortId: `C${220 + Math.floor(Math.random() * 10)}`,
+        cohortId: cohortId,
         liveSessionType: '30 MINUTES',
         liveDays: 'T-Th',
         liveTime: '6:00 PM',
         soloDays: 'M-W-F',
         soloTime: '10:00 AM'
       } : null,
+
+      // Ramp Off data (writeable)
       rampOff: Math.random() > 0.8 ? {
         stage: 'Offboarding Completed',
         time: '14 Days',
@@ -96,6 +98,8 @@ export const generateSamplePatients = () => {
         exitCategory: 'Completed Program',
         exitDate: '10/30/25'
       } : null,
+
+      // Risk tickets (can have multiple)
       riskTickets: Math.random() > 0.7 ? [{
         id: `RT${Math.floor(Math.random() * 10000)}`,
         stage: ['High Risk', 'Medium Risk', 'Low Risk'][Math.floor(Math.random() * 3)],
@@ -105,6 +109,8 @@ export const generateSamplePatients = () => {
         mitigationAttempted: '10/16/25',
         mitigationCompleted: Math.random() > 0.5 ? '10/18/25' : null
       }] : [],
+
+      // Deferral tickets (can have multiple)
       deferralTickets: Math.random() > 0.85 ? [{
         id: `DT${Math.floor(Math.random() * 10000)}`,
         stage: ['30 Days', '60 Days', '90 Days'][Math.floor(Math.random() * 3)],
@@ -116,10 +122,10 @@ export const generateSamplePatients = () => {
       }] : []
     };
   });
-};
+}
 
-export const generateSampleCohorts = () =>
-  Array.from({ length: 15 }, (_, i) => ({
+export function generateSampleCohorts() {
+  return Array.from({ length: 15 }, (_, i) => ({
     id: `C${200 + i}`,
     cohortSize: Math.floor(4 + Math.random() * 8),
     cohortType: ['Group A', 'Group B', 'Group C'][Math.floor(Math.random() * 3)],
@@ -128,3 +134,4 @@ export const generateSampleCohorts = () =>
     liveTime: ['9:00 AM', '2:00 PM', '6:00 PM'][Math.floor(Math.random() * 3)],
     patientsIds: []
   }));
+}
